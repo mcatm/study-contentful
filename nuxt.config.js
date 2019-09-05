@@ -1,6 +1,6 @@
 import pkg from './package'
 
-require('dotenv').config()
+if(process.env.NODE_ENV == 'development') require('dotenv').config()
 
 export default {
   mode: 'spa',

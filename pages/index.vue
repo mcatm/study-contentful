@@ -25,6 +25,8 @@
 <script>
 import { client } from '~/plugins/contentful'
 
+// console.log(process.env.NODE_ENV)
+
 export default {
   name: 'Home',
   head: () => {
