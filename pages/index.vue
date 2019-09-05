@@ -1,45 +1,58 @@
 <template>
   <section class="section">
     <div class="columns is-mobile">
-      <card
-        title="Free"
-        icon="github-circle"
-      >
-        Open source on <a href="https://github.com/buefy/buefy"> GitHub</a>
-      </card>
-
-      <card
-        title="Responsive"
-        icon="cellphone-link"
-      >
-        <b class="has-text-grey">Every</b> component is responsive
-      </card>
-
-      <card
-        title="Modern"
-        icon="alert-decagram"
-      >
-        Built with <a href="https://vuejs.org/">Vue.js</a> and <a href="http://bulma.io/">Bulma</a>
-      </card>
-
-      <card
-        title="Lightweight"
-        icon="arrange-bring-to-front"
-      >
-        No other internal dependency
-      </card>
+      <ul>
+        <li
+          v-for="(post, i) of posts"
+          :key="i"
+          :post="post"
+          class="box"
+        >
+          <div class="content">
+            <h1 class="title is-4">
+              <nuxt-link :to="{ name: 'posts-id', params: { id: post.sys.id }}">
+                {{ post.fields.title }}
+              </nuxt-link>
+            </h1>
+            <p>{{ post.fields.summary }}</p>
+          </div>
+        </li>
+      </ul>
     </div>
   </section>
 </template>
 
 <script>
-import Card from '~/components/Card'
+import { client } from '~/plugins/contentful'
 
 export default {
-  name: 'HomePage',
-
-  components: {
-    Card
+  name: 'Home',
+  head: () => {
+    return {
+      title: 'Home'
+    }
+  },
+  components: {},
+  asyncData({ env, params }) {
+    return client
+      .getEntries({
+        limit: 20,
+        content_type: 'post',
+        order: '-sys.createdAt'
+      })
+      .then(entries => {
+        return {
+          posts: entries.items.map( item => {
+            if( item.fields.media ) {
+              client.getAsset(item.fields.media.sys.id)
+                .then( asset => item.image = asset.fields )
+                .catch(console.error)
+            }
+            return item
+          })
+        }
+      })
+      .catch(console.error)
   }
 }
 </script>

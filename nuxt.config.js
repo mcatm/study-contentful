@@ -1,5 +1,7 @@
 import pkg from './package'
 
+require('dotenv').config()
+
 export default {
   mode: 'spa',
 
@@ -52,6 +54,8 @@ export default {
     // See https://github.com/nuxt-community/axios-module#options
   },
 
+  env: process.env,
+
   /*
   ** Build configuration
   */
@@ -60,12 +64,14 @@ export default {
     ** You can extend webpack config here
     */
     extend(config, ctx) {
+      config.node = {
+        fs: 'empty'
+      }
       // Run ESLint on save
       if (ctx.isDev && ctx.isClient) {
         config.module.rules.push({
           enforce: 'pre',
           test: /\.(js|vue)$/,
-          loader: 'eslint-loader',
           exclude: /(node_modules)/
         })
       }
