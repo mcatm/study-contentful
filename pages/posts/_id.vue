@@ -21,7 +21,7 @@
 
 <script>
 import { documentToHtmlString } from '@contentful/rich-text-html-renderer'
-import { client } from '~/plugins/contentful'
+import { client, previewClient } from '~/plugins/contentful'
 
 export default {
   name: 'PostDetail',
@@ -31,12 +31,13 @@ export default {
     }
   },
   components: {},
-  asyncData({ env, params }) {
-    return client
-      .getEntry(params.id)
+  asyncData(context) {
+    const c = context.query.mode == "preview" ? previewClient : client
+    return c
+      .getEntry(context.params.id)
       .then(entry => {
         if( entry.fields.image ) {
-          client.getAsset(entry.fields.image.sys.id)
+          c.getAsset(entry.fields.image.sys.id)
             .then( asset => entry.image = asset.fields )
             .catch(console.error)
         }
